@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider,
   signInWithPopup, signOut, updateProfile, signInWithEmailAndPassword,
-  onAuthStateChanged, signInWithRedirect } from "firebase/auth";
+  onAuthStateChanged, signInWithRedirect, OAuthProvider  } from "firebase/auth";
 import { getDatabase, ref, get, set } from "firebase/database";
 import { v4 as uuid } from 'uuid';
 
@@ -43,16 +43,47 @@ export function login({ email, password }) {
 
 export function loginWithGithub() {
   const provider = new GithubAuthProvider();
-  signInWithPopup(auth, provider)
-    .catch(console.error);
+  return signInWithPopup(auth, provider)
+    .then((result) => {
+      return result.user; // 사용자 정보 반환
+    })
+    .catch(error => {
+      console.error("Github 로그인 오류:", error);
+      throw error; // 오류 재 throw
+    });
 }
 
 export function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
-  signInWithRedirect(auth, provider)
-  // signInWithPopup(auth, provider)
-    .catch(console.error);
+  return signInWithPopup(auth, provider)
+    .then((result) => {
+      return result.user; // 사용자 정보 반환
+    })
+    .catch(error => {
+      console.error("Google 로그인 오류:", error);
+      throw error; // 오류 재 throw
+    });
 }
+
+export function loginWithKakao(){
+  const provider = new OAuthProvider('oidc.kakao');
+
+  // 카카오 로그인
+signInWithPopup(auth, provider)
+  .then((result) => {
+    // User is signed in.
+    // IdP data available using getAdditionalUserInfo(result)
+
+    // Get the OAuth access token and ID Token
+    const credential = OAuthProvider.credentialFromResult(result);
+    const accessToken = credential.accessToken;
+    const idToken = credential.idToken;
+  })
+  .catch((error) => {
+    // Handle error.
+  });
+}
+
 
 export function logout() {
   signOut(auth).catch(console.error);
