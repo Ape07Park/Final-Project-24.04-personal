@@ -80,7 +80,8 @@ signInWithPopup(auth, provider)
     const idToken = credential.idToken;
   })
   .catch((error) => {
-    // Handle error.
+    console.error("kakao 로그인 오류:", error);
+      throw error; // 오류 재 throw
   });
 }
 
