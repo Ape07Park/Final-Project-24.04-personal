@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { loginWithGithub, login } from '../../api/firebase';
+import { login, loginWithKakao, loginWithGoogle } from '../../api/firebase';
 import { useNavigate, Link } from "react-router-dom";
 
 export default function SignIn() {
@@ -11,16 +11,25 @@ export default function SignIn() {
   const handleSubmit = e => {
     e.preventDefault();
     login(userInfo);
-    navigate(-1);
+    console.log("일반 로그인 성공");
+    navigate("/Home");
   }
   
-  const handleGithub = e => {
-    loginWithGithub();
-    navigate(-1);
+  const handleGoogle = e => {
+    loginWithGoogle();
+    console.log("구글 로그인 성공");
+    navigate("/Home");
   }
 
+  const handleKakao = e => {
+    loginWithKakao();
+    console.log("카카오 로그인 성공");
+    navigate("/Home");
+  }
+
+
   return (
-    <div style={{margin: '20px'}}>
+    <div style={{margin: '20px', textAlign:"center"}}>
       <form onSubmit={handleSubmit}>
         <input type="email" name='email' value={userInfo.email} placeholder="이메일"
           onChange={handleChange} /><br />
@@ -30,7 +39,9 @@ export default function SignIn() {
       </form><br />
       <span>아직 계정이 없으신가요?</span>
       <Link to='/signUp'>사용자 등록</Link><br /><br />
-      <button onClick={handleGithub}>깃허브 로그인</button>
+      
+      <button onClick={handleGoogle}>구글 로그인</button><br />
+      <button onClick={handleKakao}>카카오 로그인</button><br />
 
     </div>
   )

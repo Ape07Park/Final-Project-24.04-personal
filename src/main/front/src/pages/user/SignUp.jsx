@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { register, loginWithGithub, loginWithGoogle, loginWithKakao } from '../../api/firebase';
-import { Link } from "react-router-dom";
-import { useHistory } from 'react-router';
+import React, { useState } from "react";
+import { register, loginWithGoogle, loginWithKakao } from '../../api/firebase';
+import { Link, useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 
 export default function SignUp() {
   const [userInfo, setUserInfo] = useState({
     email:'', password:'', name:'', addr:'', 
-    detailAddr:'', tel:'', req:'', def:'', isDeleted:'', emailExists: false // 이메일 중복 여부 추가
+    detailAddr:'', tel:'', req:'', def:'', isDeleted:''
   });
+
+  const navigate = useNavigate();
 
   // 사용자 정보 변경 핸들러
   const handleChange = e => {
@@ -21,7 +22,10 @@ export default function SignUp() {
       setUserInfo({...userInfo, [name]: value});
     }
   }
+
   // ** 이메일 인증을 하고 이메일 입력할 수 있게 할지 고민 
+
+
   // 이메일 중복 확인 핸들러
   const handleEmailBlur = () => {
     // 여기서는 간단히 이메일이 비어있지 않으면 중복된 것으로 가정합니다.
@@ -33,24 +37,11 @@ export default function SignUp() {
   // 폼 제출 핸들러
   const handleSubmit = e => {
     e.preventDefault(); // 기본 제출 동작 방지
-    if (!userInfo.emailExists) { // 이메일 중복이 아닐 때만 등록
       register(userInfo); // 사용자 등록 함수 호출
       console.log("회원가입 정보:", userInfo); // 회원가입 정보 출력
-    }
-    else {
-      alert('중복된 이메일입니다.');
-    }
+      navigate('/signIn');
   }
 
-  // 깃허브 로그인 핸들러
-const handleGithub = async () => {
-  try {
-    const userInfo = await loginWithGithub();
-    console.log("깃허브로 로그인한 사용자 정보:", userInfo);
-  } catch (error) {
-    console.error("깃허브 로그인 오류:", error);
-  }
-}
 
 // 구글 로그인 핸들러
 const handleGoogle = async () => {
@@ -60,8 +51,10 @@ const handleGoogle = async () => {
   } catch (error) {
     console.error("구글 로그인 오류:", error);
   }
+  navigate('/Home');
 }
 
+// 카카오 로그인 핸들러
 const handleKakao = async () => {
   try {
     const userInfo = await loginWithKakao();
@@ -69,8 +62,8 @@ const handleKakao = async () => {
   } catch (error) {
     console.error("카카오 로그인 오류:", error);
   }
+  navigate('/Home');
 }
-
 
   // Daum 우편번호 팝업 열기 함수
   const openPostcode = useDaumPostcodePopup("//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js");
@@ -101,8 +94,8 @@ const handleKakao = async () => {
       <form onSubmit={handleSubmit}>
         {/* 이메일 입력란 */}
           <input type="email" name='email' value={userInfo.email} placeholder="이메일"
-            onChange={handleChange} onBlur={handleEmailBlur} />
-          {userInfo.emailExists && <span style={{marginLeft: '10px', color: 'red'}}>이미 등록된 이메일입니다.</span>}<br />
+            onChange={handleChange} onBlur={handleEmailBlur} /><br/>
+          
         
         
         {/* 비밀번호 입력란 */}
@@ -146,10 +139,6 @@ const handleKakao = async () => {
       {/* 이미 계정이 있으신가요? */}
       <span>계정이 있으신가요?</span>
       <Link to='/signIn'>로그인</Link><br /><br />
-
-      {/* 깃허브 로그인 버튼 */}
-      <button onClick={handleGithub}>깃허브 로그인</button>
-      <br /><br />
       
       {/* 구글 로그인 버튼 */}
       <button onClick={handleGoogle}>구글 로그인</button>

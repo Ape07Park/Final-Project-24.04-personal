@@ -1,22 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // BrowserRouter를 직접 import
+import { BrowserRouter, Routes, Route } from 'react-router-dom'; // BrowserRouter를 사용
+
 import NotFound from './pages/NotFound';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import Kakao from './api/Kakao.js';
+import Kakao from './api/kakao.js';
 
-// Router를 직접 import하여 사용
-ReactDOM.render(
-  <Router>
+const root = document.getElementById('root');
+
+const router = (
+  <BrowserRouter> {/* BrowserRouter로 감싸기 */}
     <Routes>
-      <Route path="/" element={<App />} />
+      <Route path="*" element={<App />} />
       <Route path="/callback/kakaotalk" element={<Kakao />} />
-      <Route path="*" element={<NotFound />} /> {/* NotFound 페이지를 위한 Route */}
+      <Route path="/home/*" element={<App />} />
+      <Route path="/user/signup/*" element={<App />} /> {/* App 컴포넌트를 /signup 경로에도 렌더링 */}
+      <Route path="/user/signin/*" element={<App />} /> {/* App 컴포넌트를 /signin 경로에도 렌더링 */}
+      <Route path="/user/UserInfo/*" element={<App />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
-  </Router>,
-  document.getElementById('root')
+  </BrowserRouter>
 );
 
-// reportWebVitals 함수 호출
+ReactDOM.render(router, root);
 reportWebVitals();
