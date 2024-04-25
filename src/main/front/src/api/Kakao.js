@@ -1,4 +1,4 @@
-// 카카오 초기화 코드와 로그인 처리 코드를 통합
+// 카카오 초기화 코드와 로그인 처리 코드
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ const Kakao = () => {
     const params = new URL(window.location.href).searchParams;
     const code = params.get("code");
 
-    const kakaoRestApiKey = process.env.REACT_APP_KAKAO_API_KEY;
+    const kakaoRestApiKey = process.env.REACT_APP_KAKAO_API_KEY; // 
 
     // 카카오 SDK 초기화
     if (!window.Kakao.isInitialized()) {

@@ -144,7 +144,7 @@ const handleKakao = async () => {
       <button onClick={handleGoogle}>구글 로그인</button>
       <br /><br />
 
-      {/* 구글 로그인 버튼 */}
+      {/* 카카오 로그인 버튼 */}
       <button onClick={handleKakao}>카카오 로그인</button>
       <br /><br />
       

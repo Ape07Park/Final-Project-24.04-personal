@@ -75,6 +75,7 @@ export function login({ email, password }) {
   });
 }
 
+// # 구글 로그인
 export function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
   return signInWithPopup(auth, provider)
@@ -89,7 +90,7 @@ export function loginWithGoogle() {
     });
 }
 
-// 카카오 로그인
+// # 카카오 로그인
 export function loginWithKakao(){
   const provider = new OAuthProvider('oidc.kakao');
 
