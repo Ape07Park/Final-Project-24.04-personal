@@ -1,17 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { getUserInfo } from '../../api/firebase'; // getUserInfo 함수 import
+import { getUser, updateUserData } from '../../api/firebase'; // getUserInfo 함수 import
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import { Link, useNavigate } from 'react-router-dom'; // useHistory 대신 useNavigate 사용
+import { onAuthStateChanged, getAuth } from 'firebase/auth';
 
 export default function UserInfo() {
+  const navigate = useNavigate(); // useNavigate hook 사용
+  const auth = getAuth();
+  const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [updateTrigger, setUpdateTrigger] = useState(false); // 업데이트 트리거 상태
 
+  // 인증 상태가 변경될 때마다 실행되는 콜백 함수 등록
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 getUserInfo 함수를 호출하여 사용자 정보를 가져옴
-    const info = getUserInfo();
-    console.log(info);
-    setUserInfo(info);
-  }, []);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUserEmail(user.email); // 사용자 이메일 설정
+      } else {
+        setCurrentUserEmail(null); // 사용자가 로그아웃된 경우 이메일 초기화
+      }
+    });
+  }, [auth]); // auth 객체가 변경될 때마다 useEffect가 실행되도록 수정
+
+  // userInfo.email이 변경될 때마다 실행되는 useEffect
+  useEffect(() => {
+    // userInfo.email이 유효한 경우에만 getUser 함수 호출
+    if (currentUserEmail) {
+      const fetchUserInfo = async () => {
+        try {
+          // getUser 함수를 호출할 때, 사용자의 이메일 값을 전달
+          const info = await getUser(currentUserEmail);
+          setUserInfo(info);
+        } catch (error) {
+          console.error('사용자 정보를 불러오는 중 에러:', error);
+        }
+      };
+
+      // fetchUserInfo 함수 호출
+      fetchUserInfo();
+    }
+  }, [currentUserEmail, updateTrigger]); // updateTrigger 상태가 변경될 때마다 useEffect가 실행되도록 수정
+
+  const handleUpdate = (newUserInfo) => {
+    navigate('/UserUpdate', { state: { userInfo: newUserInfo } });
+  };
+
 
   return (
     <div>
@@ -19,38 +53,39 @@ export default function UserInfo() {
         User Information
       </Typography>
       <Stack spacing={2}>
-        {userInfo ? (
+        {userInfo ? ( // userInfo가 유효한 경우에만 렌더링
           <div>
             <Typography variant="body1">
-              <strong>Email:</strong> {userInfo.email}
+              <strong>Email:</strong> {userInfo.email || 'N/A'} {/* 이메일 필드가 없는 경우 'N/A'를 표시 */}
             </Typography>
 
             <Typography variant="body1">
-              <strong>Display Name:</strong> {userInfo.displayName}
+              <strong>Name:</strong> {userInfo.name || 'N/A'} {/* displayName 필드가 없는 경우 'N/A'를 표시 */}
             </Typography>
 
             <Typography variant="body1">
-              <strong>주소:</strong> {userInfo.addr}
+              <strong>주소:</strong> {userInfo.addr || 'N/A'} {/* addr 필드가 없는 경우 'N/A'를 표시 */}
             </Typography>
 
             <Typography variant="body1">
-              <strong>상세 주소:</strong> {userInfo.detailAddr}
+              <strong>상세 주소:</strong> {userInfo.detailAddr || 'N/A'} {/* detailAddr 필드가 없는 경우 'N/A'를 표시 */}
             </Typography>
 
             <Typography variant="body1">
-              <strong>전화번호:</strong> {userInfo.tel}
+              <strong>전화번호:</strong> {userInfo.tel || 'N/A'} {/* tel 필드가 없는 경우 'N/A'를 표시 */}
             </Typography>
 
             <Typography variant="body1">
-              <strong>배송 시 요청사항:</strong> {userInfo.req}
+              <strong>배송 시 요청사항:</strong> {userInfo.req || 'N/A'} {/* req 필드가 없는 경우 'N/A'를 표시 */}
             </Typography>
             
             <Typography variant="body1">
               <strong>Email Verified:</strong> {userInfo.emailVerified ? 'Yes' : 'No'}
             </Typography>
-            <Typography variant="body1">
-              <strong>UID:</strong> {userInfo.uid}
-            </Typography>
+            
+
+              <button onClick={() => handleUpdate(userInfo)}>업데이트 페이지로 이동</button>
+
           </div>
         ) : (
           <Typography variant="body1">Loading user information...</Typography>

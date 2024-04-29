@@ -132,6 +132,10 @@ const handleKakao = async () => {
           onChange={handleChange} /> 아니요
         <br/><br/>
 
+        {/* admin 여부 */}
+        <input type="text" name='isAdmin' value={userInfo.isAdmin=0}  
+          onChange={handleChange} hidden /><br />
+
         {/* 사용자 등록 버튼 */}
         <button type="submit">사용자 등록</button>
       </form><br />
