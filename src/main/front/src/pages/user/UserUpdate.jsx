@@ -10,6 +10,8 @@ import { useDaumPostcodePopup } from 'react-daum-postcode';
 export default function UserUpdate() {
   // 사용자 정보 관련 상태 설정
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [addr, setAddr] = useState('');
   const [detailAddr, setDetailAddr] = useState('');
@@ -26,8 +28,10 @@ export default function UserUpdate() {
   // 컴포넌트가 로드될 때, 이전 페이지에서 받은 userInfo로 각 상태 초기화
   useEffect(() => {
     if (userInfo) {
-      const { email, name, addr, detailAddr, tel, req } = userInfo;
+      const { email, password, name, addr, detailAddr, tel, req } = userInfo;
       setEmail(email || '');
+      setPassword(password || '');
+      setConfirmPassword(password || ''); // 비밀번호 확인 값도 초기화
       setName(name || '');
       setAddr(addr || '');
       setDetailAddr(detailAddr || '');
@@ -66,9 +70,16 @@ export default function UserUpdate() {
       return;
     }
 
+    // 비밀번호와 비밀번호 확인 값이 일치하는지 확인
+    if (password !== confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
     // 업데이트할 사용자 정보 객체 생성
     const updatedUserInfo = {
       email: email,
+      password: password,
       name: name,
       addr: addr,
       detailAddr: detailAddr,
@@ -92,6 +103,35 @@ export default function UserUpdate() {
     navigate(-1);
   };
 
+  const handleTelChange = (e) => {
+    const { value } = e.target;
+    
+    // 숫자 이외의 문자 제거
+    const telValue = value.replace(/[^0-9]/g, '');
+    
+    // 하이픈(-) 추가
+    let formattedTel = '';
+    if (telValue.length <= 3) {
+      formattedTel = telValue;
+    } else if (telValue.length <= 7) {
+      formattedTel = telValue.slice(0, 3) + '-' + telValue.slice(3);
+    } else if (telValue.length <= 11) {
+      formattedTel = telValue.slice(0, 3) + '-' + telValue.slice(3, 7) + '-' + telValue.slice(7);
+    } else {
+      formattedTel = telValue.slice(0, 3) + '-' + telValue.slice(3, 7) + '-' + telValue.slice(7, 11);
+    }
+    
+    // 최대 길이 제한을 넘지 않도록 자르기
+    const maxLength = 13; // 최대 길이는 13자리 (010-1234-5678)
+    const updatedTel = formattedTel.slice(0, maxLength);
+  
+    // 상태 업데이트
+    setTel(updatedTel);
+  };
+  
+
+
+
   return (
     <div>
       <Typography variant="h5" gutterBottom>
@@ -104,6 +144,18 @@ export default function UserUpdate() {
           InputProps={{
             readOnly: true, // readOnly 속성을 true로 설정하여 수정 불가능하게 함
           }}
+        />
+        <TextField
+          label="Password *"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)} // 비밀번호 입력 시 상태 업데이트
+        />
+        <TextField
+          label="Confirm Password *"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)} // 비밀번호 확인 입력 시 상태 업데이트
         />
         <TextField
           label="Name *"
@@ -127,7 +179,7 @@ export default function UserUpdate() {
         <TextField
           label="Phone Number *"
           value={tel}
-          onChange={(e) => setTel(e.target.value)} // 전화번호 입력 시 상태 업데이트
+          onChange={handleTelChange} // 전화번호 입력 시 상태 업데이트
         />
         <TextField
           label="Delivery Request *"

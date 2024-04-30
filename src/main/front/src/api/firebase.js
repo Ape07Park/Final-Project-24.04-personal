@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider,
   signInWithPopup, signOut, updateProfile, signInWithEmailAndPassword,
-  onAuthStateChanged, signInWithRedirect, OAuthProvider   } from "firebase/auth";
+  onAuthStateChanged, signInWithRedirect, OAuthProvider, deleteUser    } from "firebase/auth";
 import { v4 as uuid } from 'uuid';
 import axios from 'axios';
 import {getDatabase, ref, set, get, remove, child, update } from "firebase/database";
@@ -21,6 +21,11 @@ const database = getDatabase(app);
 export function login({ email, password }) {
   console.log('firebase.js:login(): ', email, password);
   signInWithEmailAndPassword(auth, email, password)  // email, password 받기
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    // ...
+  })
   .catch((error) => {
     // 로그인 실패
     const errorCode = error.code;
@@ -87,6 +92,7 @@ export function register({ email, password, name, addr, detailAddr,
       console.log("User created in Firebase Authentication");
       updateProfile(auth.currentUser, {
         email: email,
+        password:password,
         name: name,
         addr: addr,
         detailAddr: detailAddr,
@@ -98,7 +104,7 @@ export function register({ email, password, name, addr, detailAddr,
       console.log("User profile  updated");
     })
     .then(() => {
-      insertUser(email, name, addr, detailAddr, tel, 
+      insertUser(email, password, name, addr, detailAddr, tel, 
         req, def, isAdmin );
         console.log("User added to Database");
     })
@@ -121,7 +127,7 @@ export function register({ email, password, name, addr, detailAddr,
 }
 
 // Authentication에서 user 제거
-export function ToAuthDeleteUser() {
+export function removeUser() {
   const user = auth.currentUser; // 현재 로그인된 사용자 가져오기
   
   console.log(user);
@@ -148,7 +154,8 @@ export function ToAuthDeleteUser() {
 /*========================= # Authentication 끝=========================*/
 
 /*========================= DAO =========================*/
-function insertUser(email, name, addr, detailAddr, tel, req, def, isAdmin) {
+function insertUser(email, password, name, addr, detailAddr, 
+  tel, req, def, isAdmin) {
   if (!email) {
     console.error("이메일이 유효하지 않습니다.");
     return;
@@ -157,6 +164,7 @@ function insertUser(email, name, addr, detailAddr, tel, req, def, isAdmin) {
   // Firebase Realtime Database에 사용자 정보를 저장하는 코드
   set(ref(database, 'users/' + sanitizedEmail), {
     email: email,
+    password: password,
     name: name,
     addr: addr,
     detailAddr: detailAddr,
@@ -178,6 +186,7 @@ function insertUserWithSocial(email, displayName) {
   set(ref(database, 'users/' + sanitizedEmail), {
     email: email,
     name: displayName,
+    password:'N/A', 
     addr: '',
     detailAddr: '',
     tel: '',
@@ -194,7 +203,7 @@ function insertUserWithSocial(email, displayName) {
 
 // email이 undefined
 
-export async function getUser(email) {
+export async function selectUser(email) {
 
   if (!email) {
     console.error("이메일이 유효하지 않습니다.");
@@ -218,13 +227,14 @@ export async function getUser(email) {
 }
 
 export async function updateUserData(user) {
-  const { email, name, addr, detailAddr, tel, req } = user;
+  const { email, password, name, addr, detailAddr, tel, req } = user;
   try {
     // email이 정의되어 있을 때만 업데이트를 시도합니다.
     if (email) {
       const sanitizedEmail = email.replace(/[.#$[\]]/g, ''); // 특수 문자를 제거한 이메일
       await update(ref(database, `users/${sanitizedEmail}`), {
         name,
+        password,
         addr,
         detailAddr,
         tel,
@@ -240,7 +250,7 @@ export async function updateUserData(user) {
   }
 }
 
-export async function deleteUser(email) {
+export async function deleteUserData(email) {
   try {
     const sanitizedEmail = email.replace(/[.#$[\]]/g, ''); // 특수 문자를 제거한 이메일
     await remove(ref(database, `users/${sanitizedEmail}`));

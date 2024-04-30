@@ -5,7 +5,7 @@ import { useDaumPostcodePopup } from 'react-daum-postcode';
 
 export default function SignUp() {
   const [userInfo, setUserInfo] = useState({
-    email:'', password:'', name:'', addr:'', 
+    email:'', password:'', confirmPassword:'', name:'', addr:'', 
     detailAddr:'', tel:'', req:'', def:'', isAdmin: 0 // isAdmin 초기값 추가
   });
 
@@ -18,7 +18,12 @@ export default function SignUp() {
     if (name === "req" && value.trim() === '') {
       setUserInfo({...userInfo, [name]: '조심히 와주세요'});
     } 
-    else {
+    else if (name === "tel") {
+      // 전화번호 입력 시 '-' 추가
+      const telValue = value.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
+      const formattedTel = telValue.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+      setUserInfo({...userInfo, [name]: formattedTel});
+    } else {
       setUserInfo({...userInfo, [name]: value});
     }
   }
@@ -34,9 +39,13 @@ export default function SignUp() {
   // 폼 제출 핸들러
   const handleSubmit = e => {
     e.preventDefault(); // 기본 제출 동작 방지
-      register(userInfo); // 사용자 등록 함수 호출
-      console.log("회원가입 정보:", userInfo); // 회원가입 정보 출력
-      navigate('/signIn');
+    if (userInfo.password !== userInfo.confirmPassword) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+    register(userInfo); // 사용자 등록 함수 호출
+    console.log("회원가입 정보:", userInfo); // 회원가입 정보 출력
+    navigate('/signIn');
   }
 
   // 구글 로그인 핸들러
@@ -90,13 +99,15 @@ export default function SignUp() {
       <h2>회원가입</h2>
       <form onSubmit={handleSubmit}>
         {/* 이메일 입력란 */}
-          <input type="email" name='email' value={userInfo.email} placeholder="이메일"
-            onChange={handleChange} onBlur={handleEmailBlur} required /><br/><br/>
-          
-        
+        <input type="email" name='email' value={userInfo.email} placeholder="이메일"
+          onChange={handleChange} onBlur={handleEmailBlur} required /><br/><br/>
         
         {/* 비밀번호 입력란 */}
-        <input type="password" name='password' value={userInfo.password} placeholder="패스워드"
+        <input type="password" name='password' value={userInfo.password} placeholder="비밀번호"
+          onChange={handleChange} required /><br /><br/>
+
+        {/* 비밀번호 확인 입력란 */}
+        <input type="password" name='confirmPassword' value={userInfo.confirmPassword} placeholder="비밀번호 확인"
           onChange={handleChange} required /><br /><br/>
 
         {/* 이름 입력란 */}
@@ -115,7 +126,7 @@ export default function SignUp() {
           onChange={handleChange} /><br /><br/>
 
         {/* 전화번호 입력란 */}
-        <input type="text" name="tel" value={userInfo.tel} placeholder="전화번호" required maxLength="11"
+        <input type="text" name="tel" value={userInfo.tel} placeholder="전화번호" required maxLength="13"
           onChange={handleChange} /><br /><br/>
 
         {/* 배송 요청사항 입력란 */}

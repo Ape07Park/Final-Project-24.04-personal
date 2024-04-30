@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getUser,  deleteUser } from '../../api/firebase'; // getUserInfo 함수 import
+import { deleteUserData, removeUser, selectUser } from '../../api/firebase'; // getUserInfo 함수 import
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import { useNavigate } from 'react-router-dom'; // useHistory 대신 useNavigate 사용
 import { onAuthStateChanged, getAuth } from 'firebase/auth';
 import Button from '@mui/material/Button';
+
 
 export default function UserInfo() {
   const navigate = useNavigate(); // useNavigate hook 사용
@@ -31,7 +32,7 @@ export default function UserInfo() {
       const fetchUserInfo = async () => {
         try {
           // getUser 함수를 호출할 때, 사용자의 이메일 값을 전달
-          const info = await getUser(currentUserEmail);
+          const info = await selectUser(currentUserEmail);
           setUserInfo(info);
         } catch (error) {
           console.error('사용자 정보를 불러오는 중 에러:', error);
@@ -47,12 +48,26 @@ export default function UserInfo() {
     navigate('/UserUpdate', { state: { userInfo: newUserInfo } });
   };
 
-  const handleDelete = () => {
-    // 취소 버튼 클릭 시 이전 페이지로 이동
-    deleteUser(userInfo.email);
+  const handleDelete = async () => {
+    // 사용자 이메일을 userInfo에서 추출
+    const userEmail = userInfo?.email;
+
+    try {
+      // db에서 사용자 정보 삭제
+      await deleteUserData(userEmail);
+
+      // auth에서 사용자 계정 삭제
+      await removeUser(userEmail);
+
+      // 알림창 띄우기
+      alert('계정이 삭제되었습니다.');
+
+      // 메인 페이지로 이동
+      navigate('/home');
+    } catch (error) {
+      console.error('계정 삭제 중 오류:', error);
+    }
   };
-
-
 
   return (
     <div>
@@ -65,6 +80,11 @@ export default function UserInfo() {
             <Typography variant="body1">
               <strong>Email:</strong> {userInfo.email || 'N/A'} {/* 이메일 필드가 없는 경우 'N/A'를 표시 */}
             </Typography>
+
+            <Typography variant="body1" style={{ display: 'none' }}>
+              <strong>Password:</strong> {userInfo.password || 'N/A'} {/* password 필드가 없는 경우 'N/A'를 표시 */}
+            </Typography>
+
 
             <Typography variant="body1">
               <strong>Name:</strong> {userInfo.name || 'N/A'} {/* displayName 필드가 없는 경우 'N/A'를 표시 */}
@@ -91,12 +111,11 @@ export default function UserInfo() {
             </Typography>
 
             <hr/>
-              <Button onClick={() => handleUpdate(userInfo)}>업데이트 페이지로 이동</Button>
-
-              <hr/>
+            <Button onClick={() => handleUpdate(userInfo)}>업데이트 페이지로 이동</Button>
+            <hr/>
 
             <Button variant="contained" onClick={handleDelete}>
-                계정 삭제
+              계정 삭제
             </Button>
 
           </div>

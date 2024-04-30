@@ -33,8 +33,7 @@ export default function SignIn() {
     console.log("카카오 로그인 성공");
     navigate("/Home");
   }
-
-
+  
   return (
     <div style={{margin: '20px', textAlign:"center"}}>
       <form>
