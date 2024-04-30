@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { getUser, updateUserData } from '../../api/firebase'; // getUserInfo 함수 import
+import { getUser,  deleteUser } from '../../api/firebase'; // getUserInfo 함수 import
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import { Link, useNavigate } from 'react-router-dom'; // useHistory 대신 useNavigate 사용
+import { useNavigate } from 'react-router-dom'; // useHistory 대신 useNavigate 사용
 import { onAuthStateChanged, getAuth } from 'firebase/auth';
+import Button from '@mui/material/Button';
 
 export default function UserInfo() {
   const navigate = useNavigate(); // useNavigate hook 사용
   const auth = getAuth();
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  const [updateTrigger, setUpdateTrigger] = useState(false); // 업데이트 트리거 상태
+  const [updateTrigger] = useState(false); // 업데이트 트리거 상태
 
   // 인증 상태가 변경될 때마다 실행되는 콜백 함수 등록
   useEffect(() => {
@@ -45,6 +46,12 @@ export default function UserInfo() {
   const handleUpdate = (newUserInfo) => {
     navigate('/UserUpdate', { state: { userInfo: newUserInfo } });
   };
+
+  const handleDelete = () => {
+    // 취소 버튼 클릭 시 이전 페이지로 이동
+    deleteUser(userInfo.email);
+  };
+
 
 
   return (
@@ -82,9 +89,15 @@ export default function UserInfo() {
             <Typography variant="body1">
               <strong>Email Verified:</strong> {userInfo.emailVerified ? 'Yes' : 'No'}
             </Typography>
-            
 
-              <button onClick={() => handleUpdate(userInfo)}>업데이트 페이지로 이동</button>
+            <hr/>
+              <Button onClick={() => handleUpdate(userInfo)}>업데이트 페이지로 이동</Button>
+
+              <hr/>
+
+            <Button variant="contained" onClick={handleDelete}>
+                계정 삭제
+            </Button>
 
           </div>
         ) : (

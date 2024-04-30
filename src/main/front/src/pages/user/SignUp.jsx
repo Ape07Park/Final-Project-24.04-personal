@@ -6,7 +6,7 @@ import { useDaumPostcodePopup } from 'react-daum-postcode';
 export default function SignUp() {
   const [userInfo, setUserInfo] = useState({
     email:'', password:'', name:'', addr:'', 
-    detailAddr:'', tel:'', req:'', def:'', isDeleted:''
+    detailAddr:'', tel:'', req:'', def:'', isAdmin: 0 // isAdmin 초기값 추가
   });
 
   const navigate = useNavigate();
@@ -22,9 +22,6 @@ export default function SignUp() {
       setUserInfo({...userInfo, [name]: value});
     }
   }
-
-  // ** 이메일 인증을 하고 이메일 입력할 수 있게 할지 고민 
-
 
   // 이메일 중복 확인 핸들러
   const handleEmailBlur = () => {
@@ -42,28 +39,27 @@ export default function SignUp() {
       navigate('/signIn');
   }
 
-
-// 구글 로그인 핸들러
-const handleGoogle = async () => {
-  try {
-    const userInfo = await loginWithGoogle();
-    console.log("구글로 로그인한 사용자 정보:", userInfo);
-  } catch (error) {
-    console.error("구글 로그인 오류:", error);
+  // 구글 로그인 핸들러
+  const handleGoogle = async () => {
+    try {
+      const userInfo = await loginWithGoogle();
+      console.log("구글로 로그인한 사용자 정보:", userInfo);
+    } catch (error) {
+      console.error("구글 로그인 오류:", error);
+    }
+    navigate('/Home');
   }
-  navigate('/Home');
-}
 
-// 카카오 로그인 핸들러
-const handleKakao = async () => {
-  try {
-    const userInfo = await loginWithKakao();
-    console.log("카카오로 로그인한 사용자 정보:", userInfo);
-  } catch (error) {
-    console.error("카카오 로그인 오류:", error);
+  // 카카오 로그인 핸들러
+  const handleKakao = async () => {
+    try {
+      const userInfo = await loginWithKakao();
+      console.log("카카오로 로그인한 사용자 정보:", userInfo);
+    } catch (error) {
+      console.error("카카오 로그인 오류:", error);
+    }
+    navigate('/Home');
   }
-  navigate('/Home');
-}
 
   // Daum 우편번호 팝업 열기 함수
   const openPostcode = useDaumPostcodePopup("//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js");
@@ -91,38 +87,40 @@ const handleKakao = async () => {
 
   return (
     <div style={{margin: '20px', textAlign:'center'}}>
+      <h2>회원가입</h2>
       <form onSubmit={handleSubmit}>
         {/* 이메일 입력란 */}
           <input type="email" name='email' value={userInfo.email} placeholder="이메일"
-            onChange={handleChange} onBlur={handleEmailBlur} /><br/>
+            onChange={handleChange} onBlur={handleEmailBlur} required /><br/><br/>
           
         
         
         {/* 비밀번호 입력란 */}
         <input type="password" name='password' value={userInfo.password} placeholder="패스워드"
-          onChange={handleChange} /><br />
+          onChange={handleChange} required /><br /><br/>
 
         {/* 이름 입력란 */}
         <input type="text" name='name' value={userInfo.name} placeholder="이름" required
-          onChange={handleChange} /><br />
+          onChange={handleChange} /><br /><br/>
 
         {/* 우편번호 입력란 */}
         <button type='button' onClick={() => openPostcode({ onComplete: handleComplete })}>
           우편번호 찾기
-        </button><br />
-        <input type="text" id="sample6_postcode" placeholder="우편번호" value={userInfo.addr} readOnly /><br/>
+        </button><br /><br/>
+        
+        <input type="text" id="sample6_postcode" placeholder="우편번호" value={userInfo.addr} readOnly /><br/><br/>
 
         {/* 상세주소 입력란 */}
         <input type="text" id="sample6_detailAddress" name='detailAddr' value={userInfo.detailAddr} placeholder="받는 분 상세주소" required
-          onChange={handleChange} /><br />
+          onChange={handleChange} /><br /><br/>
 
         {/* 전화번호 입력란 */}
         <input type="text" name="tel" value={userInfo.tel} placeholder="전화번호" required maxLength="11"
-          onChange={handleChange} /><br />
+          onChange={handleChange} /><br /><br/>
 
         {/* 배송 요청사항 입력란 */}
         <input type="text" name='req' value={userInfo.req="조심히 와주세요"} placeholder="배송시 요청사항" 
-          onChange={handleChange} hidden /><br />
+          onChange={handleChange} hidden/><br />
 
         {/* 기본 배송 여부 선택 */}
         <input type="radio" name='def' value="Y" checked={userInfo.def === "Y"} 
@@ -131,10 +129,6 @@ const handleKakao = async () => {
         <input type="radio" name='def' value="N" checked={userInfo.def === "N"}
           onChange={handleChange} /> 아니요
         <br/><br/>
-
-        {/* admin 여부 */}
-        <input type="text" name='isAdmin' value={userInfo.isAdmin=0}  
-          onChange={handleChange} hidden /><br />
 
         {/* 사용자 등록 버튼 */}
         <button type="submit">사용자 등록</button>
