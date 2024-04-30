@@ -48,27 +48,39 @@ export default function SignUp() {
     navigate('/signIn');
   }
 
-  // 구글 로그인 핸들러
-  const handleGoogle = async () => {
-    try {
-      const userInfo = await loginWithGoogle();
-      console.log("구글로 로그인한 사용자 정보:", userInfo);
-    } catch (error) {
-      console.error("구글 로그인 오류:", error);
-    }
-    navigate('/Home');
+// 구글 로그인 핸들러
+const handleGoogle = async () => {
+  try {
+    const userInfo = await loginWithGoogle();
+    console.log("구글로 로그인한 사용자 정보:", userInfo);
+    navigate('/UserInfo');
+    setTimeout(() => {
+      alert("업데이트 페이지에서 사용자 정보를 업데이트 해주세요");
+    }, 700); // setTimeout을 사용하여 다음 이벤트 큐에 넣어 순서를 조정합니다.
+  } catch (error) {
+    console.error("구글 로그인 오류:", error);
+    alert("구글 로그인에 오류가 발생했습니다.");
+    navigate('/home'); // 또는 다른 경로로 리다이렉트
   }
+}
 
-  // 카카오 로그인 핸들러
-  const handleKakao = async () => {
-    try {
-      const userInfo = await loginWithKakao();
-      console.log("카카오로 로그인한 사용자 정보:", userInfo);
-    } catch (error) {
-      console.error("카카오 로그인 오류:", error);
-    }
-    navigate('/Home');
+// 카카오 로그인 핸들러
+const handleKakao = async () => {
+  try {
+    const userInfo = await loginWithKakao();
+    console.log("카카오로 로그인한 사용자 정보:", userInfo);
+    navigate('/UserInfo'); // 'UserInfo' 페이지로 이동
+    setTimeout(() => {
+      alert("업데이트 페이지에서 사용자 정보를 업데이트 해주세요");
+    }, 700); // setTimeout을 사용하여 다음 이벤트 큐에 넣어 순서를 조정합니다.
+  } catch (error) {
+    console.error("카카오 로그인 오류:", error);
+    alert("카카오 로그인에 오류가 발생했습니다.");
+    navigate('/home'); // 또는 다른 경로로 리다이렉트
   }
+}
+
+
 
   // Daum 우편번호 팝업 열기 함수
   const openPostcode = useDaumPostcodePopup("//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js");

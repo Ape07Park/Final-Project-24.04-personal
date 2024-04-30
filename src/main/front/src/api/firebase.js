@@ -4,7 +4,7 @@ import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider,
   onAuthStateChanged, signInWithRedirect, OAuthProvider, deleteUser    } from "firebase/auth";
 import { v4 as uuid } from 'uuid';
 import axios from 'axios';
-import {getDatabase, ref, set, get, remove, child, update } from "firebase/database";
+import {getDatabase, ref, set, get, remove, update } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -20,18 +20,31 @@ const database = getDatabase(app);
 /*========================= login =========================*/
 export function login({ email, password }) {
   console.log('firebase.js:login(): ', email, password);
-  signInWithEmailAndPassword(auth, email, password)  // email, password 받기
-  .then((userCredential) => {
-    // Signed in 
-    const user = userCredential.user;
-    // ...
-  })
-  .catch((error) => {
-    // 로그인 실패
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    console.error('로그인 실패:', errorMessage);
-  });
+  return signInWithEmailAndPassword(auth, email, password)  // email, password 받기
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      // ...
+      return user;
+    })
+    .catch((error) => {
+      // 로그인 실패
+      const errorMessage = error.message;
+      console.error('로그인 실패:', errorMessage);
+      // 오류 메시지에 따라 알림창 띄우기
+      let alertMessage = '';
+      if (errorMessage === '올바르지 않은 이메일 형식입니다.') {
+        alertMessage = '올바르지 않은 이메일 형식입니다.';
+      } else if (errorMessage === '아이디나 비밀번호가 잘못되었습니다.') {
+        alertMessage = '아이디나 비밀번호가 잘못되었습니다.';
+      } else if (errorMessage === '존재하지 않는 사용자입니다.') {
+        alertMessage = '존재하지 않는 사용자입니다.';
+      } else {
+        alertMessage = '아이디나 비밀번호가 잘못되었습니다.';
+      }
+      alert(alertMessage);
+      throw error; // 오류를 호출한 곳으로 전달
+    });
 }
 
 // # 구글 로그인
@@ -260,7 +273,7 @@ export async function deleteUserData(email) {
     return { success: false, message: '사용자 정보 삭제 중 오류가 발생했습니다.' };
   }
 }
-
+/*========================= DAO 끝 =========================*/
 
 /*========================= 인증 상태 확인 =========================*/
 
@@ -288,7 +301,6 @@ export function onUserStateChanged(callback) {
 
   return unsubscribe; // unsubscribe 함수 반환
 }
-
 
 // # 관리자 관련 함수 
 // Axios를 사용하여 서버에서 관리자 목록을 가져오는 함수

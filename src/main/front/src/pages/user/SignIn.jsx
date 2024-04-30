@@ -5,33 +5,52 @@ import { useNavigate, Link } from "react-router-dom";
 export default function SignIn() {
   const [userInfo, setUserInfo] = useState({email:'', password:''});
   const navigate = useNavigate();
+
   const handleChange = e => {
     setUserInfo({...userInfo, [e.target.name]: e.target.value});
   }
-  const handleSubmit = e => {
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    // 이메일과 패스워드가 둘 다 입력되었는지 확인
-    if (userInfo.email.trim() === '' || userInfo.password.trim() === '') {
-      alert('이메일 혹은 패스워드를 모두 입력해주세요.');
-    } // db와 비교해서 이메일, 비번 틀린 경우 alert('이메일 혹은 패스워드가 틀렸습니다');
-    
-    else{
-      login(userInfo);
-      console.log("일반 로그인 성공");
+    try {
+      if (userInfo.email.trim() === '' || userInfo.password.trim() === '') {
+        alert('이메일 혹은 패스워드를 모두 입력해주세요.');
+      } 
+      else{
+      // 로그인 시도
+      const userData = await login(userInfo);
+      console.log("일반 로그인 성공:", userData);
       navigate("/Home");
+      }
+      // * 나중에 수정 필요
+    } catch (error) {
+      // 로그인 실패 시 오류 메시지 표시
+      console.error('로그인 오류:', error);
     }
-}
+  }
   
-  const handleGoogle = e => {
-    loginWithGoogle();
-    console.log("구글 로그인 성공");
-    navigate("/Home");
+  const handleGoogle = async () => {
+    try {
+      await loginWithGoogle();
+      console.log("구글 로그인 성공");
+      navigate("/Home");
+    } catch (error) {
+      // 로그인 실패 시 오류 메시지 표시
+      alert('구글 로그인에 실패했습니다.');
+      console.error('구글 로그인 오류:', error);
+    }
   }
 
-  const handleKakao = e => {
-    loginWithKakao();
-    console.log("카카오 로그인 성공");
-    navigate("/Home");
+  const handleKakao = async () => {
+    try {
+      await loginWithKakao();
+      console.log("카카오 로그인 성공");
+      navigate("/Home");
+    } catch (error) {
+      // 로그인 실패 시 오류 메시지 표시
+      alert('카카오 로그인에 실패했습니다.');
+      console.error('카카오 로그인 오류:', error);
+    }
   }
   
   return (
