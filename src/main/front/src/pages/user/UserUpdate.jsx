@@ -129,58 +129,63 @@ export default function UserUpdate() {
     setTel(updatedTel);
   };
   
-
-
-
+  // ============================== html
   return (
     <div>
-      <Typography variant="h5" gutterBottom>
-        Update User Information - * 는 필수 입력
+      <Typography variant="h5" gutterBottom> {/* 제목  */}
+        Update User Information - * 는 필수 입력 
       </Typography>
-      <Stack spacing={2}>
-        <TextField
+      <Stack spacing={2}> {/* 이메일 입력 */}
+        <TextField 
           label="Email *"
           value={email}
           InputProps={{
             readOnly: true, // readOnly 속성을 true로 설정하여 수정 불가능하게 함
           }}
         />
+        {/* *비번 입력 */}
         <TextField
           label="Password *"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)} // 비밀번호 입력 시 상태 업데이트
         />
+        {/* *비번확인 입력 */}
         <TextField
           label="Confirm Password *"
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)} // 비밀번호 확인 입력 시 상태 업데이트
         />
+        {/* *이름 입력 */}
         <TextField
           label="Name *"
           value={name}
           onChange={(e) => setName(e.target.value)} // 이름 입력 시 상태 업데이트
         />
-        {/* 우편번호 찾기 버튼 */}
+        {/* *우편번호 찾기 버튼 */}
         <button type='button' onClick={() => openPostcode({ onComplete: handleComplete })}>
           우편번호 찾기
         </button><br />
+        {/* 우편번호 찾기 통해 찾으면 주소 들어가는 박스 */}
         <TextField
           label="Address *"
           value={addr}
           onChange={(e) => setAddr(e.target.value)} // 주소 입력 시 상태 업데이트
         />
+        {/* *상세 주소 입력 창 */}
         <TextField
           label="Detail Address *"
           value={detailAddr}
           onChange={(e) => setDetailAddr(e.target.value)} // 상세 주소 입력 시 상태 업데이트
         />
+        {/* *전화번호 입력 */}
         <TextField
           label="Phone Number *"
           value={tel}
           onChange={handleTelChange} // 전화번호 입력 시 상태 업데이트
         />
+        {/* *배송 요청사항 입력 */}
         <TextField
           label="Delivery Request *"
           value={req}

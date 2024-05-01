@@ -1,5 +1,5 @@
 package com.example.ft.service;
 
-public interface UserService {
+public interface OrderService {
 	
 }

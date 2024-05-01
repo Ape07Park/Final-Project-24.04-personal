@@ -1,6 +1,8 @@
 package com.example.ft.entity;
 
-import lombok.AllArgsConstructor;
+import java.time.LocalDate;
+
+import lombok.AllArgsConstructor; 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,14 +15,19 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
-public class User {
+public class Order {
+	
+	private int oid;
 	private String email;
+	private String status;
 	private String name;
 	private String addr;
 	private String detailAddr;
 	private String tel;
 	private String req;
-	private String def;
+	private String way;
+	private int totalPrice;
+	private LocalDate regDate;
 	private int isDeleted;
 	
 }

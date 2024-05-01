@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { register, loginWithGoogle, loginWithKakao } from '../../api/firebase';
+import { authRegister, loginWithGoogle, loginWithKakao } from '../../api/firebase';
 import { Link, useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 
@@ -43,7 +43,7 @@ export default function SignUp() {
       alert("비밀번호가 일치하지 않습니다.");
       return;
     }
-    register(userInfo); // 사용자 등록 함수 호출
+    authRegister(userInfo); // 사용자 등록 함수 호출
     console.log("회원가입 정보:", userInfo); // 회원가입 정보 출력
     navigate('/signIn');
   }
@@ -69,18 +69,17 @@ const handleKakao = async () => {
   try {
     const userInfo = await loginWithKakao();
     console.log("카카오로 로그인한 사용자 정보:", userInfo);
-    navigate('/UserInfo'); // 'UserInfo' 페이지로 이동
+    // 'UserInfo' 페이지로 이동 후, 일정 시간 뒤에 알림을 띄우고 'UserUpdate' 페이지로 이동
+    navigate('/UserInfo'); 
     setTimeout(() => {
       alert("업데이트 페이지에서 사용자 정보를 업데이트 해주세요");
-    }, 700); // setTimeout을 사용하여 다음 이벤트 큐에 넣어 순서를 조정합니다.
+    }, 700);
   } catch (error) {
     console.error("카카오 로그인 오류:", error);
     alert("카카오 로그인에 오류가 발생했습니다.");
     navigate('/home'); // 또는 다른 경로로 리다이렉트
   }
 }
-
-
 
   // Daum 우편번호 팝업 열기 함수
   const openPostcode = useDaumPostcodePopup("//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js");

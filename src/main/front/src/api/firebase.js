@@ -54,7 +54,7 @@ export function loginWithGoogle() {
   .then((result) => {
 
       console.log(result.user); // 사용자 정보 찍어보기
-      insertUserWithSocial(result.user.email, result.user.displayName) // 사용자 정보 db에 저장
+      insertUserDataWithSocial(result.user.email, result.user.displayName) // 사용자 정보 db에 저장
       return result.user; // 사용자 정보 반환
     })
     
@@ -79,7 +79,7 @@ signInWithPopup(auth, provider)
     const idToken = credential.idToken;
     
     console.log(result.user); // 사용자 정보 찍어보기
-    insertUserWithSocial(result.user.email, result.user.displayName) // 사용자 정보 db에 저장
+    insertUserDataWithSocial(result.user.email, result.user.displayName) // 사용자 정보 db에 저장
     return result.user;
   })
   .catch((error) => {
@@ -95,7 +95,7 @@ export function logout() {
 // --------------------- #login 끝 ----------------------
 
 /*========================= # Authentication =========================*/
-export function register({ email, password, name, addr, detailAddr, 
+export function authRegister({ email, password, name, addr, detailAddr, 
   tel, req, def, isAdmin}) { //  사용처에서 obj로 처리하기에 그것에 맞춰서 제공 
   console.log('firebase:register():', email, password);
   createUserWithEmailAndPassword(auth, email, password) 
@@ -117,7 +117,7 @@ export function register({ email, password, name, addr, detailAddr,
       console.log("User profile  updated");
     })
     .then(() => {
-      insertUser(email, password, name, addr, detailAddr, tel, 
+      insertUserData(email, password, name, addr, detailAddr, tel, 
         req, def, isAdmin );
         console.log("User added to Database");
     })
@@ -139,8 +139,8 @@ export function register({ email, password, name, addr, detailAddr,
     });
 }
 
-// Authentication에서 user 제거
-export function removeUser() {
+// Authentication에서 user 제거하고 DB에서도 제거
+export function authRemoveUser() {
   const user = auth.currentUser; // 현재 로그인된 사용자 가져오기
   
   console.log(user);
@@ -151,14 +151,15 @@ export function removeUser() {
     console.log("User deleted from Authentication");
 
     // DB에서 사용자 삭제
-    deleteUser(user.email).then(() => {
+    deleteUserData(user.email).then(() => {
       // 사용자가 DB에서 삭제된 경우
       console.log("User deleted from Database");
     }).catch((error) => {
       // DB에서 사용자 삭제 중 오류 발생한 경우
       console.error("Error deleting user from Database:", error);
     });
-  }).catch((error) => {
+  })
+  .catch((error) => {
     // Firebase Authentication에서 사용자 삭제 중 오류 발생한 경우
     console.error("Error deleting user from Authentication:", error);
   });
@@ -167,7 +168,7 @@ export function removeUser() {
 /*========================= # Authentication 끝=========================*/
 
 /*========================= DAO =========================*/
-function insertUser(email, password, name, addr, detailAddr, 
+function insertUserData(email, password, name, addr, detailAddr, 
   tel, req, def, isAdmin) {
   if (!email) {
     console.error("이메일이 유효하지 않습니다.");
@@ -193,7 +194,7 @@ function insertUser(email, password, name, addr, detailAddr,
 }
 
 // 소셜 로그인을 이용하여 로그인 한 경우 DB에 데이터 저장
-function insertUserWithSocial(email, displayName) {
+function insertUserDataWithSocial(email, displayName) {
   const sanitizedEmail = email.replace(/[.#$[\]]/g, ''); // 특수 문자를 제거한 이메일
   // Firebase Realtime Database에 사용자 정보를 저장하는 코드
   set(ref(database, 'users/' + sanitizedEmail), {
@@ -216,7 +217,7 @@ function insertUserWithSocial(email, displayName) {
 
 // email이 undefined
 
-export async function selectUser(email) {
+export async function selectUserData(email) {
 
   if (!email) {
     console.error("이메일이 유효하지 않습니다.");
@@ -275,9 +276,9 @@ export async function deleteUserData(email) {
 }
 /*========================= DAO 끝 =========================*/
 
-/*========================= 인증 상태 확인 =========================*/
+/*========================= 인증 상태 확인 ==================*/
 
-// onAuthStateChanged 함수를 호출하여 사용자의 인증 상태가 변경될 때 호출되는 콜백 함수 등록
+// 이건 지워도 됨. onAuthStateChanged 함수를 호출하여 사용자의 인증 상태가 변경될 때 호출되는 콜백 함수 등록
 onAuthStateChanged(auth, (user) => {
   if (user) {
     // 사용자가 로그인된 상태일 때 실행되는 부분
@@ -295,42 +296,41 @@ onAuthStateChanged(auth, (user) => {
 // 사용자의 인증 상태가 변경될 때 호출되는 콜백 함수를 등록하고, 해제할 수 있는 unsubscribe 함수 반환
 export function onUserStateChanged(callback) {
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
-    const updatedUser = user ? await adminUser(user) : null;
+    const updatedUser = user ? await getAdmin(user) : null;
     callback(updatedUser);
   });
-
   return unsubscribe; // unsubscribe 함수 반환
 }
 
-// # 관리자 관련 함수 
-// Axios를 사용하여 서버에서 관리자 목록을 가져오는 함수
-async function fetchAdmins() {
-  try {
-    const response = await axios.get('서버에서 관리자 목록을 가져오는 엔드포인트 URL'); // 서버에서 관리자 목록을 가져오는 요청
-    return response.data; // 관리자 목록 반환
-  } catch (error) {
-    console.error('Failed to fetch admins:', error);
-    return []; // 에러 발생 시 빈 배열 반환
-  }
+/*========================= 인증 상태 확인 끝==================*/
+
+/*========================= 관리자 =========================*/
+
+// # 관리자 가져오기 함수 
+async function getAdmin(user) {
+  return get(ref(database, 'admins'))
+    .then(snapshot => {
+      if (snapshot.exists()) {
+        const admins = snapshot.val();
+        // console.log(admins);
+        const isAdmin = admins.includes(user.uid);
+        return {...user, isAdmin};
+      }
+      return user;
+    });
 }
 
 // 관리자인지 확인하는 함수
-async function isAdmin(user) {
-  const admins = await fetchAdmins(); // 서버에서 관리자 목록 가져오기
-  return admins.includes(user.email); // 관리자 목록에 사용자의 email가 포함되어 있는지 확인하여 true 또는 false 반환
-}
-
-// 사용자 정보를 관리자 권한으로 업데이트하는 함수
-async function adminUser(user) {
+export async function isAdmin(user) {
   try {
-    const userWithAdminFlag = {
-      ...user,
-      isAdmin: await isAdmin(user) // 사용자가 관리자인지 여부 확인하여 isAdmin 속성 추가
-    };
-    return userWithAdminFlag; // 업데이트된 사용자 정보 반환
+    const admins = await getAdmin(); // 서버에서 관리자 목록 가져오기
+    const isAdmin = admins.includes(user.email);
+    return {...user, isAdmin};
+    
   } catch (error) {
-    console.error('Failed to update user with admin flag:', error);
-    return user; // 에러 발생 시 원본 사용자 정보 반환
+    console.error("Error checking admin status:", error);
+    return false; // 에러 발생 시 관리자가 아닌 것으로 처리
   }
 }
 
+/*========================= 관리자 끝 =========================*/
