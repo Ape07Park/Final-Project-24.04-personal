@@ -8,6 +8,6 @@ import com.example.ft.entity.Order;
 @Mapper
 public interface OrderDao {
 	
-//	@Select("select * from users where email=#{email}")
-//	User user = 
+	@Select("select * from order where email=#{email}")
+	Order getOrder(String email); 
 }

@@ -3,10 +3,43 @@ import { authRegister, loginWithGoogle, loginWithKakao } from '../../api/firebas
 import { Link, useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 
+// mui 
+import { IconButton } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
+
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+// 디자인
+function Copyright(props) {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="https://mui.com/">
+        Your Website
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
+
+const defaultTheme = createTheme();
+
+// 기능
 export default function SignUp() {
   const [userInfo, setUserInfo] = useState({
-    email:'', password:'', confirmPassword:'', name:'', addr:'', 
-    detailAddr:'', tel:'', req:'', def:'', isAdmin: 0 // isAdmin 초기값 추가
+    email: '', password: '', confirmPassword: '', name: '', addr: '',
+    detailAddr: '', tel: '', req: '', def: '', isAdmin: 0 // isAdmin 초기값 추가
   });
 
   const navigate = useNavigate();
@@ -14,17 +47,17 @@ export default function SignUp() {
   // 사용자 정보 변경 핸들러
   const handleChange = e => {
     const { name, value } = e.target;
-    
+
     if (name === "req" && value.trim() === '') {
-      setUserInfo({...userInfo, [name]: '조심히 와주세요'});
-    } 
+      setUserInfo({ ...userInfo, [name]: '조심히 와주세요' });
+    }
     else if (name === "tel") {
       // 전화번호 입력 시 '-' 추가
       const telValue = value.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
       const formattedTel = telValue.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
-      setUserInfo({...userInfo, [name]: formattedTel});
+      setUserInfo({ ...userInfo, [name]: formattedTel });
     } else {
-      setUserInfo({...userInfo, [name]: value});
+      setUserInfo({ ...userInfo, [name]: value });
     }
   }
 
@@ -32,7 +65,7 @@ export default function SignUp() {
   const handleEmailBlur = () => {
     // 여기서는 간단히 이메일이 비어있지 않으면 중복된 것으로 가정합니다.
     if (userInfo.email !== '') {
-      setUserInfo({...userInfo, emailExists: true});
+      setUserInfo({ ...userInfo, emailExists: true });
     }
   }
 
@@ -48,38 +81,38 @@ export default function SignUp() {
     navigate('/signIn');
   }
 
-// 구글 로그인 핸들러
-const handleGoogle = async () => {
-  try {
-    const userInfo = await loginWithGoogle();
-    console.log("구글로 로그인한 사용자 정보:", userInfo);
-    navigate('/UserInfo');
-    setTimeout(() => {
-      alert("업데이트 페이지에서 사용자 정보를 업데이트 해주세요");
-    }, 700); // setTimeout을 사용하여 다음 이벤트 큐에 넣어 순서를 조정합니다.
-  } catch (error) {
-    console.error("구글 로그인 오류:", error);
-    alert("구글 로그인에 오류가 발생했습니다.");
-    navigate('/home'); // 또는 다른 경로로 리다이렉트
+  // 구글 로그인 핸들러
+  const handleGoogle = async () => {
+    try {
+      const userInfo = await loginWithGoogle();
+      console.log("구글로 로그인한 사용자 정보:", userInfo);
+      navigate('/UserInfo');
+      setTimeout(() => {
+        alert("업데이트 페이지에서 사용자 정보를 업데이트 해주세요");
+      }, 700); // setTimeout을 사용하여 다음 이벤트 큐에 넣어 순서를 조정합니다.
+    } catch (error) {
+      console.error("구글 로그인 오류:", error);
+      alert("구글 로그인에 오류가 발생했습니다.");
+      navigate('/home'); // 또는 다른 경로로 리다이렉트
+    }
   }
-}
 
-// 카카오 로그인 핸들러
-const handleKakao = async () => {
-  try {
-    const userInfo = await loginWithKakao();
-    console.log("카카오로 로그인한 사용자 정보:", userInfo);
-    // 'UserInfo' 페이지로 이동 후, 일정 시간 뒤에 알림을 띄우고 'UserUpdate' 페이지로 이동
-    navigate('/UserInfo'); 
-    setTimeout(() => {
-      alert("업데이트 페이지에서 사용자 정보를 업데이트 해주세요");
-    }, 700);
-  } catch (error) {
-    console.error("카카오 로그인 오류:", error);
-    alert("카카오 로그인에 오류가 발생했습니다.");
-    navigate('/home'); // 또는 다른 경로로 리다이렉트
+  // 카카오 로그인 핸들러
+  const handleKakao = async () => {
+    try {
+      const userInfo = await loginWithKakao();
+      console.log("카카오로 로그인한 사용자 정보:", userInfo);
+      // 'UserInfo' 페이지로 이동 후, 일정 시간 뒤에 알림을 띄우고 'UserUpdate' 페이지로 이동
+      navigate('/UserInfo');
+      setTimeout(() => {
+        alert("업데이트 페이지에서 사용자 정보를 업데이트 해주세요");
+      }, 700);
+    } catch (error) {
+      console.error("카카오 로그인 오류:", error);
+      alert("카카오 로그인에 오류가 발생했습니다.");
+      navigate('/home'); // 또는 다른 경로로 리다이렉트
+    }
   }
-}
 
   // Daum 우편번호 팝업 열기 함수
   const openPostcode = useDaumPostcodePopup("//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js");
@@ -106,68 +139,201 @@ const handleKakao = async () => {
   };
 
   return (
-    <div style={{margin: '20px', textAlign:'center'}}>
-      <h2>회원가입</h2>
-      <form onSubmit={handleSubmit}>
-        {/* 이메일 입력란 */}
-        <input type="email" name='email' value={userInfo.email} placeholder="이메일"
-          onChange={handleChange} onBlur={handleEmailBlur} required /><br/><br/>
-        
-        {/* 비밀번호 입력란 */}
-        <input type="password" name='password' value={userInfo.password} placeholder="비밀번호"
-          onChange={handleChange} required /><br /><br/>
+    <>
+    <ThemeProvider theme={defaultTheme}>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
 
-        {/* 비밀번호 확인 입력란 */}
-        <input type="password" name='confirmPassword' value={userInfo.confirmPassword} placeholder="비밀번호 확인"
-          onChange={handleChange} required /><br /><br/>
+          <Typography component="h1" variant="h5">
+            회원가입
+          </Typography>
 
-        {/* 이름 입력란 */}
-        <input type="text" name='name' value={userInfo.name} placeholder="이름" required
-          onChange={handleChange} /><br /><br/>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Grid container spacing={2}>
+          <form></form>
+            <Grid item xs={12}>
+              {/* 이메일 */}
+              <TextField
+                autoComplete="given-name"
+                name="email"
+                fullWidth
+                id="email"
+                label="이메일"
+                autoFocus
+                value={userInfo.email}
+                onChange={handleChange}
+                onBlur={handleEmailBlur}
+              />
+            </Grid>
 
-        {/* 우편번호 입력란 */}
-        <button type='button' onClick={() => openPostcode({ onComplete: handleComplete })}>
-          우편번호 찾기
-        </button><br /><br/>
-        
-        <input type="text" id="sample6_postcode" placeholder="우편번호" value={userInfo.addr} readOnly /><br/><br/>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                name="password"
+                label="비밀번호"
+                type="password"
+                id="password"
+                autoComplete="new-password"
+                value={userInfo.password}
+                onChange={handleChange}
+              />
+            </Grid>
 
-        {/* 상세주소 입력란 */}
-        <input type="text" id="sample6_detailAddress" name='detailAddr' value={userInfo.detailAddr} placeholder="받는 분 상세주소" required
-          onChange={handleChange} /><br /><br/>
+            {/* 비밀번호 확인 */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                name="confirmPassword"
+                label="비밀번호 확인"
+                type="password"
+                id="confirmPassword"
+                autoComplete="confirmPassword"
+                value={userInfo.confirmPassword}
+                onChange={handleChange}
+              />
+            </Grid>
 
-        {/* 전화번호 입력란 */}
-        <input type="text" name="tel" value={userInfo.tel} placeholder="전화번호" required maxLength="13"
-          onChange={handleChange} /><br /><br/>
+            {/* 이름 */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="name"
+                label="이름"
+                name="name"
+                autoComplete="name"
+                value={userInfo.name}
+                onChange={handleChange}
+              />
+            </Grid>
 
-        {/* 배송 요청사항 입력란 */}
-        <input type="text" name='req' value={userInfo.req="조심히 와주세요"} placeholder="배송시 요청사항" 
-          onChange={handleChange} hidden/><br />
+            {/*우편번호찾기*/}
+            <Grid item xs={12}>
+              <Button
+                type="button"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 1 }}
+                onClick={() => openPostcode({ onComplete: handleComplete })}
+              >
+                우편번호 찾기
+              </Button>
+            </Grid>
+
+            {/*우편번호*/}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="addr"
+                label="우편번호"
+                name="addr"
+                autoComplete="sample6_postcode"
+                value={userInfo.addr}
+                readOnly
+              />
+            </Grid>
+
+            {/*상세주소*/}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                name='detailAddr'
+                label="상세주소"
+                type="text"
+                id="sample6_detailAddress"
+                autoComplete="sample6_deailAddress"
+                value={userInfo.detailAddr}
+                onChange={handleChange}
+              />
+            </Grid>
+
+            {/*전화번호*/}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                name="tel"
+                label="전화번호"
+                type="tel"
+                id="tel"
+                maxLength="13"
+                value={userInfo.tel}
+                onChange={handleChange}
+              />
+            </Grid>
+
+            {/*배송시 요청사항*/}
+            <Grid item xs={12} style={{display:'none'}}>
+              <TextField
+                fullWidth
+                name="req"
+                label="배송시 요청사항"
+                id="req"
+                maxLength="13"
+                value={userInfo.req = "조심히 와주세요"}
+                hidden
+                onChange={handleChange}
+              />
+            </Grid>
 
         {/* 기본 배송 여부 선택 */}
-        <input type="radio" name='def' value="Y" checked={userInfo.def === "Y"} 
-          onChange={handleChange} /> 예
-
-        <input type="radio" name='def' value="N" checked={userInfo.def === "N"}
-          onChange={handleChange} /> 아니요
-        <br/><br/>
+        <Grid item xs={12}>
+      <RadioGroup 
+        row
+        name='def' 
+        value={userInfo.def} 
+        onChange={handleChange}
+      >
+        <FormControlLabel 
+          value="Y" 
+          control={<Radio />} 
+          label="예" 
+          checked={userInfo.def === "Y"} 
+        />
+        <FormControlLabel 
+          value="N" 
+          control={<Radio />} 
+          label="아니요" 
+          checked={userInfo.def === "N"} 
+        />
+      </RadioGroup>
+    </Grid>
+          </Grid>
+        </Box>
 
         {/* 사용자 등록 버튼 */}
-        <button type="submit">사용자 등록</button>
-      </form><br />
+  <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} onClick={handleSubmit}>
+    사용자 등록
+  </Button>
 
-      {/* 이미 계정이 있으신가요? */}
-      <span>계정이 있으신가요?</span>
-      <Link to='/signIn'>로그인</Link><br /><br />
-      
-      {/* 구글 로그인 버튼 */}
-      <button onClick={handleGoogle}>구글 로그인</button>
-      <br /><br />
+  {/* 이미 계정이 있으신가요? */}
+  <Grid container justifyContent="flex-end">
+    <Grid item>
 
-      {/* 카카오 로그인 버튼 */}
+    <Link to="/SignIn" variant="body2" style={{ marginRight: '10px' }}>
+      계정이 있으신가요? 로그인
+    </Link>    
+
+     {/* 구글 로그인 */}
+    <IconButton onClick={handleGoogle} aria-label="Google 로그인">
+      <GoogleIcon />
+    </IconButton>
+    {/* 카카오 */}
       <button onClick={handleKakao}>카카오 로그인</button>
-      <br /><br />
-      
-    </div>
+    </Grid>
+  </Grid>
+
+
+</Box>
+      <Copyright sx={{ mt: 5 }} />
+    </Container>
+    </ThemeProvider >
+    </>
   )
 };

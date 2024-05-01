@@ -1,26 +1,55 @@
 import React, { useState } from "react";
 import { login, loginWithKakao, loginWithGoogle } from '../../api/firebase';
 import { useNavigate, Link } from "react-router-dom";
+// mui
+import { IconButton } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+function Copyright(props) {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="#">
+        FUNniture
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
+
+const defaultTheme = createTheme();
 
 export default function SignIn() {
-  const [userInfo, setUserInfo] = useState({email:'', password:''});
+  // 상태 변수 정의
+  const [userInfo, setUserInfo] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
+  // 이벤트 핸들러 - input 값 변화 처리
   const handleChange = e => {
-    setUserInfo({...userInfo, [e.target.name]: e.target.value});
+    setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
   }
 
+  // 이벤트 핸들러 - 로그인 시도
   const handleSubmit = async e => {
     e.preventDefault();
     try {
       if (userInfo.email.trim() === '' || userInfo.password.trim() === '') {
         alert('이메일 혹은 패스워드를 모두 입력해주세요.');
-      } 
-      else{
-      // 로그인 시도
-      const userData = await login(userInfo);
-      console.log("일반 로그인 성공:", userData);
-      navigate("/Home");
+      }
+      else {
+        // 로그인 시도
+        const userData = await login(userInfo);
+        console.log("일반 로그인 성공:", userData);
+        navigate("/Home");
       }
       // * 나중에 수정 필요
     } catch (error) {
@@ -28,7 +57,8 @@ export default function SignIn() {
       console.error('로그인 오류:', error);
     }
   }
-  
+
+  // 이벤트 핸들러 - 구글 로그인
   const handleGoogle = async () => {
     try {
       await loginWithGoogle();
@@ -41,6 +71,7 @@ export default function SignIn() {
     }
   }
 
+  // 이벤트 핸들러 - 카카오 로그인
   const handleKakao = async () => {
     try {
       await loginWithKakao();
@@ -52,23 +83,101 @@ export default function SignIn() {
       console.error('카카오 로그인 오류:', error);
     }
   }
-  
+
   return (
-    <div style={{margin: '20px', textAlign:"center"}}>
-      <form>
-        <input type="email" name='email' value={userInfo.email} placeholder="이메일"
-         required  onChange={handleChange} /><br />
-        <input type="password" name='password' value={userInfo.password} placeholder="패스워드"
-         required  onChange={handleChange} /><br />
-        <button onClick={handleSubmit}>로그인</button>
-      </form><br />
+    <ThemeProvider theme={defaultTheme}>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
 
-      <span>아직 계정이 없으신가요?</span>
-      <Link to='/signUp'>사용자 등록</Link><br /><br />
-      {/* 후에 로고로 대체하기  */}
-      <button onClick={handleGoogle}>구글 로그인</button><br /><br />
-      <button onClick={handleKakao}>카카오 로그인</button>
+          <Typography component="h1" variant="h5">
+            로그인
+          </Typography>
 
-    </div>
+          {/* 폼 요소 */}
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            {/* email 입력창 */}
+            <TextField
+              margin="normal"
+              fullWidth
+              id="email"
+              label="이메일"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={userInfo.email}
+              onChange={handleChange}
+              required
+            />
+
+            <TextField
+              margin="normal"
+              fullWidth
+              name="password"
+              label="비밀번호"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={userInfo.password}
+              onChange={handleChange}
+              required
+            />
+
+            {/* 로그인 버튼 */}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleSubmit}
+            >
+              로그인
+            </Button>
+
+            {/* 사용자 등록 링크 */}
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary" align="center">
+                아직 계정이 없으신가요?
+              </Typography>
+              <Box sx={{ textAlign: 'center' }}>
+                <Link to='/signUp' style={{ textDecoration: 'none' }}>
+                  <Button variant="contained" color="primary">
+                    사용자 등록
+                  </Button>
+                </Link>
+              </Box>
+            </Box>
+
+            {/* 소셜 로그인 버튼 */}
+
+           
+            <Grid container justifyContent="center" spacing={2}>
+              {/* 구글 로그인 버튼 */}
+              <Grid item>
+                <IconButton onClick={handleGoogle} aria-label="Google 로그인">
+                  <GoogleIcon />
+                </IconButton>
+              </Grid>
+              
+              {/* 카카오 로그인 버튼 */}
+              <Grid item>
+                <Button onClick={handleKakao}>
+                  카카오 로그인
+                </Button>
+              </Grid>
+            </Grid>
+
+          </Box>
+        </Box>
+        <Copyright sx={{ mt: 8, mb: 4 }} />
+      </Container>
+    </ThemeProvider>
   )
 }
