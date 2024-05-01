@@ -214,7 +214,6 @@ function insertUserDataWithSocial(email, displayName) {
   });
 }
 
-
 // email이 undefined
 
 export async function selectUserData(email) {
