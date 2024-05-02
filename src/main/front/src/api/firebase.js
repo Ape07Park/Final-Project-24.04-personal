@@ -320,16 +320,16 @@ async function getAdmin(user) {
 }
 
 // 관리자인지 확인하는 함수
-export async function isAdmin(user) {
-  try {
-    const admins = await getAdmin(); // 서버에서 관리자 목록 가져오기
-    const isAdmin = admins.includes(user.email);
-    return {...user, isAdmin};
+// export async function isAdmin(user) {
+//   try {
+//     const admins = await getAdmin(); // 서버에서 관리자 목록 가져오기
+//     const isAdmin = admins.includes(user.email);
+//     return {...user, isAdmin};
     
-  } catch (error) {
-    console.error("Error checking admin status:", error);
-    return false; // 에러 발생 시 관리자가 아닌 것으로 처리
-  }
-}
+//   } catch (error) {
+//     console.error("Error checking admin status:", error);
+//     return false; // 에러 발생 시 관리자가 아닌 것으로 처리
+//   }
+// }
 
 /*========================= 관리자 끝 =========================*/

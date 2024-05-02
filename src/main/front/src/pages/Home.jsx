@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import Button from '@mui/material/Button';
-import { isAdmin } from '../api/firebase'; // Firebase 함수 가져오기
+// import { isAdmin } from '../api/firebase'; // Firebase 함수 가져오기
 import { useAuthContext } from "../context/AuthContext";
 
 export default function Home() {
   const { user, logout } = useAuthContext(); // useAuthContext 훅을 사용하여 현재 사용자와 로그아웃 함수 가져오기
-  const [isAdminUser, setIsAdminUser] = useState(false);
+  // const [isAdminUser, setIsAdminUser] = useState(false);
 
-  useEffect(() => {
-    const checkAdmin = async () => {
-      if (user) {
-        const admin = await isAdmin(user); // isAdmin 함수 호출
-        setIsAdminUser(admin);
-      }
-    };
+  // useEffect(() => {
+  //   const checkAdmin = async () => {
+  //     if (user) {
+  //       const admin = await isAdmin(user); // isAdmin 함수 호출
+  //       setIsAdminUser(admin);
+  //     }
+  //   };
 
-    checkAdmin(); // useEffect에서 호출
+  //   checkAdmin(); // useEffect에서 호출
 
-  }, [user]);
+  // }, [user]);
 
   const handleLogout = () => {
     logout(); // 로그아웃 함수 호출
